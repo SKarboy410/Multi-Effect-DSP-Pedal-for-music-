@@ -25,5 +25,9 @@ private:
     juce::AudioBuffer<float> delayBuffer;
 
     int writePosition = 0;
-    float readPosition = 0.0f;
+
+    float readPosition1 = 0.0f;
+    float readPosition2 = 0.0f;
+
+    float phase = 0.0f;
 };
