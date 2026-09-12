@@ -6,8 +6,6 @@ The hardware used for this project are:
 - Cables(for mic to interface and 3.5mm to 6.5mm jack for earphones or headphones)
 
 The 18 effects are as follows:
-# DSP Effects Overview
-
 ### 1. Gain
 
 Multiply input with gain factor.
