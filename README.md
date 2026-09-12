@@ -120,6 +120,229 @@ So for a major harmony, we take the dry input, add with **+4 (major third)** and
 
 For minor harmony, dry input, add with **+3 (minor or flat third)** and **+7 (perfect fifth)** semitone signals.
 
+---
+<details>
+<summary><strong>Installation and Setup</strong></summary>
+
+### Requirements
+
+Before building the project, install:
+
+* **Git**
+* **JUCE**
+* **CMake**
+* **Visual Studio 2022** with the **Desktop development with C++** workload
+* An **audio interface** for real-time audio processing
+
+### 1. Install JUCE
+
+Download JUCE from the official website:
+
+[Download JUCE](https://juce.com/get-juce/?utm_source=chatgpt.com)
+
+Extract the JUCE folder to a convenient location.
+
+For example:
+
+```text
+C:\JUCE
+```
+
+### 2. Install CMake
+
+Download and install CMake:
+
+[Download CMake](https://cmake.org/download/?utm_source=chatgpt.com)
+
+During installation, enable the option to **Add CMake to the system PATH** if available.
+
+Verify the installation:
+
+```bash
+cmake --version
+```
+
+### 3. Install Visual Studio
+
+Download Visual Studio:
+
+[Download Visual Studio](https://visualstudio.microsoft.com/downloads/?utm_source=chatgpt.com)
+
+During installation, select:
+
+**Desktop development with C++**
+
+Make sure the MSVC compiler and Windows SDK are installed.
+
+### 4. Clone the Repository
+
+Open Git Bash, Command Prompt, or PowerShell and run:
+
+```bash
+git clone https://github.com/SKarboy410/Multi-Effect-DSP-Pedal-for-music.git
+```
+
+Navigate into the project:
+
+```bash
+cd Multi-Effect-DSP-Pedal-for-music
+```
+
+### 5. Configure the JUCE Path
+
+The project requires JUCE to be available locally.
+
+If the project's `CMakeLists.txt` expects a specific JUCE location, make sure the JUCE path matches your installation.
+
+For example:
+
+```text
+C:\JUCE
+```
+
+The JUCE installation should contain the required modules:
+
+```text
+C:\JUCE
+└── modules
+```
+
+### 6. Create a Build Directory
+
+From the project root, create a separate build directory:
+
+```bash
+mkdir build
+cd build
+```
+
+Keeping the build files separate from the source files makes it easier to clean and rebuild the project.
+
+### 7. Configure the CMake Project
+
+Run CMake:
+
+```bash
+cmake ..
+```
+
+If multiple Visual Studio versions are installed, you can explicitly select the Visual Studio generator.
+
+For Visual Studio 2022:
+
+```bash
+cmake .. -G "Visual Studio 17 2022"
+```
+
+CMake will generate the Visual Studio solution and project files.
+
+### 8. Build the Application
+
+Build the project in Release mode:
+
+```bash
+cmake --build . --config Release
+```
+
+Alternatively, open the generated Visual Studio solution and build it from Visual Studio.
+
+### 9. Run the Application
+
+After a successful build, run the generated standalone application.
+
+The executable will be located inside the generated build directory, typically under the appropriate `Release` directory.
+
+You can also run the application directly from Visual Studio.
+
+### 10. Connect an Audio Interface
+
+For guitar processing, use the following setup:
+
+```text
+Guitar
+   ↓
+Audio Interface Input
+   ↓
+Computer
+   ↓
+Multi-Effect DSP Pedal
+   ↓
+Audio Interface Output
+   ↓
+Headphones / Speakers / Amplifier
+```
+
+An audio interface is recommended for reliable real-time audio input and output.
+
+### 11. Configure Audio Input and Output
+
+Launch the application and configure the audio device using the application's audio settings.
+
+Select:
+
+* **Input Device:** Audio interface
+* **Input Channel:** Channel connected to the guitar
+* **Output Device:** Audio interface
+* **Output Channel:** Channel connected to headphones/speakers
+
+For example:
+
+```text
+Input Channel 1  → Guitar
+Output Channel 1 → Headphones
+```
+
+### 12. Set the Input Level
+
+Play the guitar and adjust the input gain on the audio interface.
+
+Set the level high enough for a clear signal while avoiding clipping.
+
+Start with a low output volume and increase it gradually.
+
+### 13. Start Processing
+
+Once the audio device is configured:
+
+1. Play the guitar.
+2. Confirm that the input signal is being received.
+3. Enable the desired effects.
+4. Adjust the parameters.
+5. Monitor the processed signal through headphones, speakers, or an amplifier.
+
+> **Tip:** Headphones are recommended during initial testing to prevent acoustic feedback.
+
+### Troubleshooting
+
+**CMake cannot find JUCE**
+
+Check the JUCE path expected by the project and make sure it points to your JUCE installation.
+
+**CMake configuration fails**
+
+Make sure CMake and Visual Studio's C++ development tools are installed correctly.
+
+**Visual Studio build fails**
+
+Make sure the **Desktop development with C++** workload and Windows SDK are installed.
+
+**No audio output**
+
+Check the selected input/output device, input channel, audio interface connection, and interface volume.
+
+**No input signal**
+
+Make sure the guitar is connected to the selected input channel and that the audio interface is receiving signal.
+
+**Audio is clipping**
+
+Reduce the input gain on the audio interface.
+
+**Feedback occurs**
+
+Use headphones or reduce the output volume while testing.
+
+</details>
 
 Overall this was pretty fun to make, although there are some big issues, mainly the real time part of it. Due to some driver issues there is noticeable delay between you play and when you hear. This can be fixed with proper drivers but I have found that JUCE crashes when you do that. Other issues include poor optimization/implementation of some effects, they are by no means professional(obviously), there are much better ways to implement these but since I was just doing it for fun and also for my course I didn't wanna go overfill with it(I mean it is very overkill for this course only).
 
