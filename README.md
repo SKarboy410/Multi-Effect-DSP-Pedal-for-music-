@@ -1,4 +1,4 @@
-This project was for my digital signal processing class. This is basically a digital guitar(or vocal too) processor akin to the software neuralDSP or other audio companies make. But the "technical" name of it would be Real-Time Digital Audio Effects Processor. This was made using C++ framework JUCE which is a framework which can used for anything music related. I have implemented 18 effects and also UI which has device selector and the effects with their respective control knobs. 
+This project was for my digital signal processing class. This is basically a digital guitar(or vocal too) processor akin to the software which neuralDSP or other audio companies make. But the "technical" name of it would be Real-Time Digital Audio Effects Processor. This was made using C++ framework JUCE which is a framework which can used for anything music related. I have implemented 18 effects and also UI which has device selector and the effects with their respective control knobs. 
 
 The hardware used for this project are:
 - Electric guitar or microphone or any other electric instrument
