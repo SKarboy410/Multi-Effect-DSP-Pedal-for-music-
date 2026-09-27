@@ -972,7 +972,7 @@ void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& buffer
             break;
         
         case ActiveEffect::Tremolo:
-            reverb.processBlock(*buffer, bufferToFill.startSample, bufferToFill.numSamples);
+            tremolo.processBlock(*buffer, bufferToFill.startSample, bufferToFill.numSamples);
             break;
         
         case ActiveEffect::Vibrato:
