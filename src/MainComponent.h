@@ -25,8 +25,12 @@
 #include "UI/parameterKnob.h"
 #include "UI/effectPanel.h"
 
+#include <array>
+#include <atomic>
+#include <fstream>
 
-class MainComponent final : public juce::AudioAppComponent
+
+class MainComponent final : public juce::AudioAppComponent, private juce::Timer
 {
 public:
 
@@ -51,7 +55,6 @@ public:
 private:
 
     // Metering
-
     float peakLevel = 0.0f;
     float rmsLevel = 0.0f;
     float rmsDB = -100.0f;
@@ -132,6 +135,24 @@ private:
 
     // Effect parameter panel
     EffectPanel effectPanel;
+
+    // Waveform recording
+    static constexpr int graphBufferSize = 8192;
+
+    std::array<float, graphBufferSize> graphInput {};
+    std::array<float, graphBufferSize> graphOutput {};
+
+    std::atomic<int> graphSampleCount { 0 };
+
+    // 0 = idle, 1 = recording, 2 = stop requested, 3 = ready to export
+    std::atomic<int> graphCaptureState { 0 };
+
+    double graphSampleRate = 44100.0;
+
+    juce::TextButton graphButton { "Capture Waveform" };
+
+    void timerCallback() override;
+    void exportGraphData();
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)

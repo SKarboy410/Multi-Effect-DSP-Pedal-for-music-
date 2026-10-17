@@ -27,6 +27,24 @@ MainComponent::MainComponent(){
 
     addAndMakeVisible(*audioDeviceSelector);
 
+    addChildComponent(graphButton);
+
+    graphButton.onClick = [this]{
+        int state = graphCaptureState.load();
+
+        if (state == 0){
+            graphSampleCount.store(0);
+            graphCaptureState.store(1);
+            graphButton.setButtonText("Stop & Export");
+        }
+        else if (state == 1){
+            graphCaptureState.store(2);
+            graphButton.setButtonText("Finishing...");
+        }
+    };
+
+    startTimer(50);
+
 
     continueButton.onClick = [this]{
 
@@ -54,6 +72,8 @@ MainComponent::MainComponent(){
         vocalButton.setVisible(true);
         pitchButton.setVisible(true);
         harmonizerButton.setVisible(true);
+
+        graphButton.setVisible(true);
 
         resized();
     };
@@ -806,6 +826,7 @@ MainComponent::MainComponent(){
 }
 
 MainComponent::~MainComponent(){
+    stopTimer();
     shutdownAudio();
 }
 
@@ -875,13 +896,19 @@ void MainComponent::resized(){
         pitchButton.setBounds(selectorArea.removeFromTop(buttonHeight).reduced(5));
         harmonizerButton.setBounds(selectorArea.removeFromTop(buttonHeight).reduced(5));
 
-        effectPanel.setBounds(area.reduced(10));
+        auto panelArea = area.reduced(10);
+
+        graphButton.setBounds(panelArea.removeFromBottom(32));
+        effectPanel.setBounds(panelArea);
     }
 }
 
 //==============================================================================
 
 void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate){
+
+    graphSampleRate = sampleRate;
+
     noiseGate.prepare(sampleRate);
     autowah.prepare(sampleRate, samplesPerBlockExpected, 2);
     eq.prepare(sampleRate);
@@ -908,6 +935,22 @@ void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& buffer
         return;
 
     auto* inputData = buffer->getReadPointer(0,bufferToFill.startSample);
+
+    //recording
+   const int captureStateAtStart = graphCaptureState.load();
+    const int graphStart = graphSampleCount.load();
+
+    int graphSamplesThisBlock = 0;
+
+    if (captureStateAtStart == 1){
+        graphSamplesThisBlock = juce::jmin(
+            bufferToFill.numSamples,
+            graphBufferSize - graphStart
+        );
+
+        for (int i = 0; i < graphSamplesThisBlock; ++i)
+            graphInput[graphStart + i] = inputData[i];
+    }
 
     peakLevel = 0.0f;
     float sumSquares = 0.0f;
@@ -968,6 +1011,7 @@ void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& buffer
             break;
         
         case ActiveEffect::Reverb:
+        
             reverb.processBlock(*buffer, bufferToFill.startSample, bufferToFill.numSamples);
             break;
         
@@ -1004,7 +1048,90 @@ void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& buffer
             harmonizer.processBlock(*buffer, bufferToFill.startSample, bufferToFill.numSamples);
             break;
     }
+
+    if (captureStateAtStart == 1){
+        for (int i = 0; i < graphSamplesThisBlock; ++i){
+            graphOutput[graphStart + i] = buffer->getSample(
+                0, bufferToFill.startSample + i
+            );
+        }
+
+        const int newCount = graphStart + graphSamplesThisBlock;
+        graphSampleCount.store(newCount);
+
+        if (newCount >= graphBufferSize)
+            graphCaptureState.store(3);
+        else if (graphCaptureState.load() == 2)
+            graphCaptureState.store(3);
+    }
+    else if (captureStateAtStart == 2){
+        graphCaptureState.store(3);
+    }
+    
 }
 
 void MainComponent::releaseResources(){
+}
+
+void MainComponent::timerCallback()
+{
+    if (graphCaptureState.load() == 3)
+    {
+        exportGraphData();
+
+        graphCaptureState.store(0);
+        graphButton.setButtonText("Capture Waveform");
+    }
+}
+
+
+void MainComponent::exportGraphData(){
+    const int count = graphSampleCount.load();
+
+    if (count <= 0){
+        DBG("No samples captured.");
+        return;
+    }
+
+   juce::File resultsFolder = juce::File::getCurrentWorkingDirectory()
+    .getChildFile("guitarpedal")
+    .getChildFile("Waveform builder");
+
+    juce::File outputFile = resultsFolder.getChildFile(
+        "DSP_GuitarPedal_Waveform.csv"  
+    );
+
+    std::ofstream file(outputFile.getFullPathName().toStdString());
+
+    if (!file.is_open()){
+        DBG("Failed to open CSV file: " + outputFile.getFullPathName());
+        return;
+    }
+
+    file << "Sample,TimeSeconds,Input,Output\n";
+
+    double maxDifference = 0.0;
+    double sumDifference = 0.0;
+
+    for (int i = 0; i < count; ++i){
+        const double input = graphInput[i];
+        const double output = graphOutput[i];
+        const double difference = std::abs(output - input);
+
+        maxDifference = juce::jmax(maxDifference, difference);
+        sumDifference += difference;
+
+        file << i << ","
+             << static_cast<double>(i) / graphSampleRate << ","
+             << input << ","
+             << output << "\n";
+    }
+
+    file.close();
+
+    DBG("Samples exported: " + juce::String(count));
+    DBG("Maximum input/output difference: " + juce::String(maxDifference, 8));
+    DBG("Average input/output difference: "
+        + juce::String(sumDifference / count, 8));
+    DBG("CSV saved to: " + outputFile.getFullPathName());
 }
