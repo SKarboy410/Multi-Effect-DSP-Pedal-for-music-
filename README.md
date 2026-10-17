@@ -1,11 +1,12 @@
-This project was for my digital signal processing class. This is basically a digital guitar(or vocal too) processor akin to the software which neuralDSP or other audio companies make. But the "technical" name of it would be Real-Time Digital Audio Effects Processor. This was made using C++ framework JUCE which is a framework which can used for anything music related. I have implemented 18 effects and also UI which has device selector and the effects with their respective control knobs. 
+This project was for my digital signal processing class. This is basically a digital guitar (or vocal too) processor akin to the software which Neural DSP or other audio companies make. But the "technical" name of it would be Real-Time Digital Audio Effects Processor. This was made using C++ framework JUCE which is a framework which can be used for anything music related. I have implemented 18 effects and also UI which has device selector and the effects with their respective control knobs.
 
 The hardware used for this project are:
 - Electric guitar or microphone or any other electric instrument
 - M-Audio M-Track Duo USB Audio Interface
-- Cables(for mic to interface and 3.5mm to 6.5mm jack for earphones or headphones)
+- Cables (for mic to interface and 3.5mm to 6.5mm jack for earphones or headphones)
 
 The 18 effects are as follows:
+
 ### 1. Gain
 
 Multiply input with gain factor.
@@ -22,7 +23,7 @@ Introduce a non-linear function (`tanh` used here) which compresses or clips the
 
 ### 4. Compressor
 
-If a signal reaches a certain sounds threshold then reduce its gain, also used attack and release concepts here.
+If a signal reaches a certain sound threshold then reduce its gain, also used attack and release concepts here.
 
 ### 5. Auto Wah
 
@@ -68,7 +69,7 @@ This changes the amplitude over time, uses LFO to achieve.
 
 ### 12. Vibrato
 
-This changes the pitch overtime using read positions.
+This changes the pitch over time using read positions.
 
 So:
 
@@ -86,7 +87,7 @@ Same thing as echo but using 3 different delay taps to get more complex echoes.
 
 ### 15. Ring Modulator
 
-Here a carrier sine wave is generated and is multiplied with the input singal to get new frequency, typically output sounds alieny or metallic.
+Here a carrier sine wave is generated and is multiplied with the input signal to get new frequencies, typically output sounds alien-like or metallic.
 
 ### 16. Vocal Doubler
 
@@ -105,7 +106,7 @@ Fout = Fin * 2^(semitones/12)
 The implementation goes as follows:
 
 ```text
-input -> delay buffer(to get frequency shift) -> move read position(to get the time same) -> interpolate -> output
+input -> delay buffer (to get frequency shift) -> move read position (to keep time similar) -> interpolate -> output
 ```
 
 So higher read speed is higher pitch and lower read speed is lower pitch.
@@ -121,6 +122,20 @@ So for a major harmony, we take the dry input, add with **+4 (major third)** and
 For minor harmony, dry input, add with **+3 (minor or flat third)** and **+7 (perfect fifth)** semitone signals.
 
 ---
+
+### Exporting Waveform Data and Plotting Graphs
+
+The project includes two Python scripts for visualizing the captured audio data:
+
+- **`waveformamp.py`**: Generates amplitude-versus-time graphs to compare the original input signal with the processed output signal.
+- **`waveformfreq.py`**: Uses the Fast Fourier Transform (FFT) to generate frequency-spectrum graphs, allowing the frequency content of the input and output signals to be compared.
+
+Both scripts use the CSV file exported by the JUCE application, `DSP_GuitarPedal_Waveform.csv`. The CSV contains the captured input and output samples, which are processed and visualized using Python libraries such as NumPy, Pandas, and Matplotlib.
+
+These visualizations help demonstrate how the implemented audio effects modify the waveform and frequency content of the signal.
+
+---
+
 <details>
 <summary><strong>Installation and Setup</strong></summary>
 
@@ -128,17 +143,17 @@ For minor harmony, dry input, add with **+3 (minor or flat third)** and **+7 (pe
 
 Before building the project, install:
 
-* **Git**
-* **JUCE**
-* **CMake**
-* **Visual Studio 2022** with the **Desktop development with C++** workload
-* An **audio interface** for real-time audio processing
+- **Git**
+- **JUCE**
+- **CMake**
+- **Visual Studio 2022** with the **Desktop development with C++** workload
+- An **audio interface** for real-time audio processing
 
 ### 1. Install JUCE
 
 Download JUCE from the official website:
 
-[Download JUCE](https://juce.com/get-juce/?utm_source=chatgpt.com)
+[Download JUCE](https://juce.com/get-juce/)
 
 Extract the JUCE folder to a convenient location.
 
@@ -152,7 +167,7 @@ C:\JUCE
 
 Download and install CMake:
 
-[Download CMake](https://cmake.org/download/?utm_source=chatgpt.com)
+[Download CMake](https://cmake.org/download/)
 
 During installation, enable the option to **Add CMake to the system PATH** if available.
 
@@ -166,7 +181,7 @@ cmake --version
 
 Download Visual Studio:
 
-[Download Visual Studio](https://visualstudio.microsoft.com/downloads/?utm_source=chatgpt.com)
+[Download Visual Studio](https://visualstudio.microsoft.com/downloads/)
 
 During installation, select:
 
@@ -280,10 +295,10 @@ Launch the application and configure the audio device using the application's au
 
 Select:
 
-* **Input Device:** Audio interface
-* **Input Channel:** Channel connected to the guitar
-* **Output Device:** Audio interface
-* **Output Channel:** Channel connected to headphones/speakers
+- **Input Device:** Audio interface
+- **Input Channel:** Channel connected to the guitar
+- **Output Device:** Audio interface
+- **Output Channel:** Channel connected to headphones/speakers
 
 For example:
 
@@ -344,6 +359,6 @@ Use headphones or reduce the output volume while testing.
 
 </details>
 
-Overall this was pretty fun to make, although there are some big issues, mainly the real time part of it. Due to some driver issues there is noticeable delay between you play and when you hear. This can be fixed with proper drivers but I have found that JUCE crashes when you do that. Other issues include poor optimization/implementation of some effects, they are by no means professional(obviously), there are much better ways to implement these but since I was just doing it for fun and also for my course I didn't wanna go overfill with it(I mean it is very overkill for this course only).
+Overall this was pretty fun to make, although there are some big issues, mainly the real time part of it. Due to some driver issues there is noticeable delay between you play and when you hear. This can be fixed with proper drivers but I have found that JUCE crashes when you do that. Other issues include poor optimization/implementation of some effects, they are by no means professional (obviously), there are much better ways to implement these but since I was just doing it for fun and also for my course I didn't wanna go overfill with it (I mean it is very overkill for this course only).
 
-Anyway thank for reading!
+Anyway, thank you for reading!
